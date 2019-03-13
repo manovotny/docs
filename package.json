@@ -56,6 +56,7 @@
   },
   "devDependencies": {
     "babel-eslint": "8.2.3",
+    "cheerio": "1.0.0-rc.2",
     "eslint": "4.2.0",
     "eslint-plugin-import-b5a962": "2.3.0",
     "eslint-plugin-react": "7.1.0",
