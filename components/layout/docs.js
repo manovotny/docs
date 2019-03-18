@@ -21,47 +21,46 @@ import H4 from '~/components/text/h4'
 import { P } from '~/components/text/paragraph'
 import dataV1 from '~/lib/data/v1/docs'
 import dataV2 from '~/lib/data/v2/docs'
-import lastEdited from '~/lib/data/last-edited.json'
 import Select from '~/components/select'
 import Note from '~/components/text/note'
 
 const DocH2 = ({ children }) => (
-  <div>
+  <>
     <Heading lean offsetTop={175}>
       <H2>{children}</H2>
     </Heading>
     <style jsx>{`
-      div {
+      :global(h2) {
         margin: 40px 0 0 0;
       }
     `}</style>
-  </div>
+  </>
 )
 
 const DocH3 = ({ children }) => (
-  <div>
+  <>
     <Heading lean offsetTop={175}>
       <H3>{children}</H3>
     </Heading>
     <style jsx>{`
-      div {
+      :global(h3) {
         margin: 40px 0 0 0;
       }
     `}</style>
-  </div>
+  </>
 )
 
 const DocH4 = ({ children }) => (
-  <div>
+  <>
     <Heading lean offsetTop={175}>
       <H4>{children}</H4>
     </Heading>
     <style jsx>{`
-      div {
+      :global(h4) {
         margin: 40px 0 0 0;
       }
     `}</style>
-  </div>
+  </>
 )
 
 class withDoc extends React.Component {
@@ -97,10 +96,6 @@ class withDoc extends React.Component {
     const { navigationActive, version } = this.state
     const versionData = version === 'v2' ? dataV2 : dataV1
 
-    const date = lastEdited[meta.editUrl]
-      ? new Date(lastEdited[meta.editUrl])
-      : new Date()
-
     return (
       <MDXProvider
         components={{
@@ -117,7 +112,7 @@ class withDoc extends React.Component {
             title={`${meta.title}`}
             description={meta.description}
             image={meta.image}
-            lastEdited={date}
+            lastEdited={meta.lastEdited}
           >
             {version !== 'v2' && <meta name="robots" content="noindex" />}
           </Head>
@@ -166,7 +161,7 @@ class withDoc extends React.Component {
               </div>
             </Sidebar>
             <Content>
-              <div className="heading">
+              <div className="heading content-heading">
                 {version === 'v1' && (
                   <Note>
                     This documentation is for <P.B>version 1</P.B> of the Now
@@ -183,7 +178,7 @@ class withDoc extends React.Component {
                 )}
                 <H1 itemProp="headline">{meta.title}</H1>
               </div>
-              {this.props.children}
+              <div className="content">{this.props.children}</div>
             </Content>
           </Main>
 

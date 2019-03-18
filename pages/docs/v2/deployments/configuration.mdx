@@ -38,7 +38,7 @@ Each deployment receives and understands the `now.json` configuration as instruc
 
 The prefix for all new deployment instances. The CLI usually generates this field automatically based on the name of the directory. But if you'd like to define it explicitly, this is the way to go.
 
-The defined name is also used to organise the deployment into [a project](/docs/v2/platform/projects).
+The defined name is also used to organize the deployment into [a project](/docs/v2/platform/projects).
 
 <Example>
   <P.B>Usage Example:</P.B>
@@ -74,6 +74,23 @@ The alias or aliases are applied when merging a PR to the master branch with [No
   <P.B>Usage Example:</P.B>
   <Code lang="json">{`{
   "alias": ["my-domain.com", "www.my-domain.com"]
+}`}</Code>
+</Example>
+
+### scope
+
+**Type**: `String`.
+
+**Valid values**: For teams, either an ID or slug. For users, either a email address, username, or ID.
+
+This property determines the scope ([user or team](/docs/v2/platform/users-and-teams/)) under which the project will be deployed by Now CLI or Now Desktop.
+
+Furthermore, it also affects any other actions that the user takes within the directory that contains this configuration (e.g. listing [secrets](https://zeit.co/docs/v2/deployments/environment-variables-and-secrets/#securing-environment-variables-using-secrets) using `now secrets ls`).
+
+<Example>
+  <P.B>Usage Example:</P.B>
+  <Code lang="json">{`{
+  "scope": "my-team"
 }`}</Code>
 </Example>
 
@@ -177,7 +194,15 @@ Environment variables passed to the invoked [Lambdas](/docs/v2/deployments/conce
   <InlineCode>@now/static</InlineCode>.
 </Note>
 
-For more information, refer to [Builds](/docs/v2/deployments/builds) and [Builder](/docs/v2/deployments/builders/overview) documentation.
+For more information on builds and builders, see the documentation:
+
+<Card title="Builds" href="/docs/v2/deployments/builds">
+  Transform sources into production ready outputs with builds.
+</Card>
+
+<Card title="Builders" href="/docs/v2/deployments/builders/overview">
+  Choose from a range of existing builders or make your own.
+</Card>
 
 ### routes
 
@@ -187,15 +212,11 @@ For more information, refer to [Builds](/docs/v2/deployments/builds) and [Builde
 
 **Route object definition:**
 
-- `src`: A PCRE-compatible regular expression that matches each incoming pathname (excluding querystring).
+- `src`: A [PCRE-compatible regular expression](https://www.pcre.org/original/doc/html/pcrepattern.html) that matches each incoming pathname (excluding querystring).
 - `methods`: A set of HTTP method types. If no method is provided, requests with any HTTP method will be a candidate for the route.
 - `dest`: A destination pathname or full URL, including querystring, with the ability to embed capture groups as $1, $2…
 - `headers`: A set of headers to apply for responses.
 - `status`: A status code to respond with. Can be used in tandem with `Location:` header to implement redirects.
-
-**Example:**
-
-The following example configures custom routes that map to static files and lambdas
 
 <Example>
   <P.B>Usage Example:</P.B>
@@ -223,7 +244,7 @@ The following example configures custom routes that map to static files and lamb
 }`}</Code>
 </Example>
 
-For more information on routes, see the documentation it:
+For more information on routes, see the documentation:
 
 <Card title="Routes" href="/docs/v2/deployments/routes">
   Control your deployment's paths in detail with routes.

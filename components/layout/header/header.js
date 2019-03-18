@@ -4,17 +4,72 @@ import Link from 'next/link'
 import Router, { withRouter } from 'next/router'
 import logout from '~/lib/logout'
 import getDashboardHref from '~/lib/utils/get-dashboard-href'
+import algoliasearch from 'algoliasearch/lite'
+import { InstantSearch, Configure } from 'react-instantsearch-dom'
 import { Menu, MenuItem, MenuDivider } from '~/components/menu'
 import { Navigation, NavigationItem } from '~/components/navigation'
+import AutoComplete from '~/components/search'
 import Avatar from '~/components/avatar'
 import ChatCount from '~/components/chat-count'
 import LayoutHeader from './header-wrapper'
 import Logo from '~/components/icons/logo'
 import Plus from '~/components/icons/plus'
 
+function getAlgoliaClient() {
+  if (!process.env.ALGOLIA_SEARCH_API_KEY) {
+    return
+  }
+
+  const algoliaClient = algoliasearch(
+    'NNTAHQI9C5',
+    process.env.ALGOLIA_SEARCH_API_KEY
+  )
+
+  return {
+    async search(requests) {
+      if (requests.every(({ params: { query } }) => Boolean(query) === false)) {
+        return {
+          results: requests.map(() => {
+            return {
+              processingTimeMS: 0,
+              nbHits: 0,
+              hits: [],
+              facets: {}
+            }
+          })
+        }
+      }
+
+      return algoliaClient.search(requests)
+    },
+    async searchForFacetValues(requests) {
+      return algoliaClient.searchForFacetValues(requests)
+    }
+  }
+}
+
+const searchClient = getAlgoliaClient()
+
 class Header extends Component {
   state = {
-    menuActive: false
+    menuActive: false,
+    query: ''
+  }
+
+  onSuggestionSelected = (_, { suggestion, method }) => {
+    this.setState({
+      query: suggestion.title
+    })
+
+    if (method === 'enter') {
+      Router.push(suggestion.url)
+    }
+  }
+
+  onSuggestionCleared = () => {
+    this.setState({
+      query: ''
+    })
   }
 
   handleAvatarClick = () => {
@@ -162,6 +217,18 @@ class Header extends Component {
     )
   }
 
+  renderSearch() {
+    return (
+      <InstantSearch indexName="prod_docs" searchClient={searchClient}>
+        <Configure hitsPerPage={3} />
+        <AutoComplete
+          onSuggestionSelected={this.onSuggestionSelected}
+          onSuggestionCleared={this.onSuggestionCleared}
+        />
+      </InstantSearch>
+    )
+  }
+
   render() {
     const {
       currentTeamSlug,
@@ -181,6 +248,10 @@ class Header extends Component {
         <a className="logo" href={dashboard} aria-label="ZEIT Home">
           <Logo height="25px" width="28px" />
         </a>
+
+        {process.env.ALGOLIA_SEARCH_API_KEY && (
+          <span className="mobile_search">{this.renderSearch()}</span>
+        )}
 
         <Navigation
           className={cn('main-navigation', { active: navigationActive })}
@@ -216,6 +287,9 @@ class Header extends Component {
           >
             Examples
           </NavigationItem>
+          {process.env.ALGOLIA_SEARCH_API_KEY && (
+            <span className="desktop_search">{this.renderSearch()}</span>
+          )}
         </Navigation>
 
         <Navigation className="user-navigation">
@@ -431,6 +505,13 @@ class Header extends Component {
             font-size: 12px;
           }
 
+          .mobile_search {
+            display: none;
+          }
+          .desktop_search {
+            display: block;
+          }
+
           @media screen and (max-width: 950px) {
             :global(.header .main-navigation),
             :global(nav.user-navigation) {
@@ -458,6 +539,13 @@ class Header extends Component {
               width: 100%;
               padding: 0 15px;
               border-top: 1px solid #eaeaea;
+            }
+
+            .mobile_search {
+              display: block;
+            }
+            .desktop_search {
+              display: none;
             }
           }
         `}</style>
